@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🖼️ WebP Master - 画像変換サービス</title>
+  <meta name="description" content="PNG・JPEG画像をWebP形式に簡単変換！クライアントサイドで安全・高速処理">
+  <meta name="keywords" content="WebP, 画像変換, PNG, JPEG, 変換ツール, 無料">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼️</text></svg>">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="WebP Master - 画像変換サービス">
+  <meta property="og:description" content="PNG・JPEG画像をWebP形式に簡単変換！">
+  <meta property="og:type" content="website">
+  
+  <!-- Preload CSS -->
+  <link rel="preload" href="./src/styles/main.css" as="style">
+  <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+  <!-- Main App Container -->
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <h1 class="header__title">
+          <span class="header__icon">🖼️</span>
+          WebP Master
+        </h1>
+        <p class="header__subtitle">
+          PNG・JPEG画像をWebP形式に簡単変換！✨
+        </p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="container">
+        <!-- Upload Section -->
+        <section class="upload-section">
+          <div class="upload-area" id="upload-area">
+            <div class="upload-area__content">
+              <div class="upload-area__icon">📤</div>
+              <h2 class="upload-area__title">画像をドラッグ&ドロップ</h2>
+              <p class="upload-area__description">
+                または <button class="upload-area__button" id="file-select-btn">ファイルを選択</button>
+              </p>
+              <div class="upload-area__formats">
+                <span class="format-tag">PNG</span>
+                <span class="format-tag">JPEG</span>
+                <span class="format-tag">JPG</span>
+              </div>
+            </div>
+            <input type="file" id="file-input" class="upload-area__input" accept="image/png,image/jpeg,image/jpg" multiple>
+          </div>
+        </section>
+
+        <!-- Processing Section -->
+        <section class="processing-section" id="processing-section">
+          <div class="processing-info">
+            <h3 class="processing-info__title">🔄 変換中...</h3>
+            <div class="progress-bar">
+              <div class="progress-bar__fill" id="progress-fill"></div>
+            </div>
+            <p class="processing-info__text" id="processing-text">準備中...</p>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="results-section">
+          <h3 class="results-section__title">📊 変換結果</h3>
+          <div class="results-grid" id="results-grid">
+            <!-- Results will be populated here -->
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p class="footer__text">
+          🔐 すべての処理はブラウザ内で実行されます。画像データは外部に送信されません。
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">読み込み中...</p>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal" id="error-modal">
+    <div class="modal__content">
+      <div class="modal__header">
+        <h3 class="modal__title">⚠️ エラーが発生しました</h3>
+        <button class="modal__close" id="error-modal-close">×</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__message" id="error-message"></p>
+      </div>
+      <div class="modal__footer">
+        <button class="button button--secondary" id="error-modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal" id="success-modal">
+    <div class="modal__content">
+      <div class="modal__header">
+        <h3 class="modal__title">✅ 変換完了！</h3>
+        <button class="modal__close" id="success-modal-close">×</button>
+      </div>
+      <div class="modal__body">
+        <p class="modal__message" id="success-message"></p>
+      </div>
+      <div class="modal__footer">
+        <button class="button button--primary" id="success-modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html> 
