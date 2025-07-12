@@ -451,37 +451,7 @@ export class PreviewManager implements IPreviewManager {
     document.body.appendChild(modal);
   }
 
-  /**
-   * Show toast notification
-   */
-  private showToast(message: string): void {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 10000;
-      animation: slideIn 0.3s ease;
-    `;
 
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease';
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 300);
-    }, 3000);
-  }
 
   /**
    * Notify download request

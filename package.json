@@ -31,5 +31,8 @@
     "vite"
   ],
   "author": "WebP Master Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "sweetalert2": "^11.22.2"
+  }
 }

@@ -13,6 +13,7 @@ import { FileHandler } from '@/services/FileHandler';
 import { ImageConverter } from '@/services/ImageConverter';
 import { UIController } from '@/services/UIController';
 import { PreviewManager } from '@/services/PreviewManager';
+import Swal from 'sweetalert2';
 
 /**
  * Main Application class
@@ -69,9 +70,6 @@ export class Application implements IApplication {
     this.ensureNotDisposed();
     
     console.log('✨ WebP Master アプリケーションが開始されました！');
-    
-    // Show initial UI state
-    this.uiController.displaySuccess('WebP Master へようこそ！画像をアップロードして変換を開始しましょう！ 🎉');
   }
 
   /**
@@ -312,12 +310,24 @@ export class Application implements IApplication {
     // Display previews
     this.previewManager.displayResults(results);
     
-    // Show success message
+    // Show success toast
     const successMessage = results.length === 1 
-      ? '1つの画像が正常に変換されました！ 🎉'
-      : `${results.length}個の画像が正常に変換されました！ 🎉`;
+      ? '1つの画像が正常に変換されました！'
+      : `${results.length}個の画像が正常に変換されました！`;
     
-    this.uiController.displaySuccess(successMessage);
+    Swal.fire({
+      icon: 'success',
+      title: '変換完了！',
+      text: successMessage,
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      background: '#f8f9fa',
+      color: '#28a745',
+      iconColor: '#28a745'
+    });
   }
 
   /**
