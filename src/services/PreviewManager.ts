@@ -67,6 +67,9 @@ export class PreviewManager implements IPreviewManager {
         console.error('Error generating preview:', error);
       }
     });
+
+    // Add bulk actions
+    this.addBulkActions(results);
   }
 
   /**
@@ -77,6 +80,15 @@ export class PreviewManager implements IPreviewManager {
     
     if (this.resultsGrid) {
       this.resultsGrid.innerHTML = '';
+      
+      // Also remove bulk actions container
+      const resultsSection = this.resultsGrid.parentElement;
+      if (resultsSection) {
+        const bulkActions = resultsSection.querySelector('.bulk-actions');
+        if (bulkActions) {
+          resultsSection.removeChild(bulkActions);
+        }
+      }
     }
   }
 
@@ -209,21 +221,41 @@ export class PreviewManager implements IPreviewManager {
     const sizeInfo = document.createElement('p');
     sizeInfo.className = 'result-card__size';
     sizeInfo.innerHTML = `
-      <span>📏 ${this.formatFileSize(result.originalFile.size)} → ${this.formatFileSize(result.convertedSize)}</span>
+      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+        <polyline points="14,2 14,8 20,8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10,9 9,9 8,9"></polyline>
+      </svg>
+      ${this.formatFileSize(result.originalFile.size)} → ${this.formatFileSize(result.convertedSize)}
     `;
 
     // Compression ratio
     const reductionInfo = document.createElement('p');
     reductionInfo.className = 'result-card__reduction';
     const reductionText = result.compressionRatio > 0 
-      ? `🎯 ${result.compressionRatio}% 圧縮`
-      : '📈 サイズが増加しました';
-    reductionInfo.textContent = reductionText;
+      ? `${result.compressionRatio}% 圧縮`
+      : 'サイズが増加しました';
+    reductionInfo.innerHTML = `
+      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="21,8 21,21 3,21 3,8"></polyline>
+        <rect x="1" y="3" width="22" height="5"></rect>
+        <line x1="10" y1="12" x2="14" y2="12"></line>
+      </svg>
+      ${reductionText}
+    `;
 
     // Processing time
     const timeInfo = document.createElement('p');
     timeInfo.className = 'result-card__time';
-    timeInfo.textContent = `⏱️ ${this.formatProcessingTime(result.processingTime)}`;
+    timeInfo.innerHTML = `
+      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+      ${this.formatProcessingTime(result.processingTime)}
+    `;
 
     section.appendChild(title);
     section.appendChild(sizeInfo);
@@ -243,29 +275,35 @@ export class PreviewManager implements IPreviewManager {
     // Download button
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'button button--primary';
-    downloadBtn.textContent = '📥 ダウンロード';
+    downloadBtn.innerHTML = `
+      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+        <polyline points="7,10 12,15 17,10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      ダウンロード
+    `;
     downloadBtn.addEventListener('click', () => {
       this.downloadFile(result);
-    });
-
-    // Copy URL button (for sharing)
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'button button--secondary';
-    copyBtn.textContent = '📋 URLをコピー';
-    copyBtn.addEventListener('click', () => {
-      this.copyToClipboard(result.convertedUrl);
     });
 
     // View fullsize button
     const viewBtn = document.createElement('button');
     viewBtn.className = 'button button--secondary';
-    viewBtn.textContent = '🔍 フルサイズで表示';
+    viewBtn.innerHTML = `
+      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h4a2 2 0 012 2v4"></path>
+        <path d="M14 9l5-5"></path>
+        <path d="M9 21H5a2 2 0 01-2-2v-4"></path>
+        <path d="M10 15l-5 5"></path>
+      </svg>
+      フルサイズで表示
+    `;
     viewBtn.addEventListener('click', () => {
       this.viewFullsize(result);
     });
 
     section.appendChild(downloadBtn);
-    section.appendChild(copyBtn);
     section.appendChild(viewBtn);
 
     return section;
@@ -305,15 +343,50 @@ export class PreviewManager implements IPreviewManager {
   }
 
   /**
-   * Copy URL to clipboard
+   * Add bulk actions (Download All, Clear)
    */
-  private async copyToClipboard(url: string): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(url);
-      this.showToast('URLをクリップボードにコピーしました！ 📋');
-    } catch (error) {
-      console.error('Failed to copy URL:', error);
-      this.showToast('URLのコピーに失敗しました ❌');
+  private addBulkActions(results: ConversionResult[]): void {
+    if (!this.resultsGrid) return;
+
+    const bulkActionsContainer = document.createElement('div');
+    bulkActionsContainer.className = 'bulk-actions';
+
+    // Download All button
+    const downloadAllBtn = document.createElement('button');
+    downloadAllBtn.className = 'button button--success';
+    downloadAllBtn.innerHTML = `
+      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+        <polyline points="7,10 12,15 17,10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      すべてダウンロード
+    `;
+    downloadAllBtn.addEventListener('click', () => {
+      this.downloadAll(results);
+    });
+
+    // Clear button
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'button button--outline';
+    clearBtn.innerHTML = `
+      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3,6 5,6 21,6"></polyline>
+        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+      </svg>
+      クリア
+    `;
+    clearBtn.addEventListener('click', () => {
+      this.clearPreviews();
+    });
+
+    bulkActionsContainer.appendChild(downloadAllBtn);
+    bulkActionsContainer.appendChild(clearBtn);
+
+    // Add to results grid parent
+    const resultsSection = this.resultsGrid.parentElement;
+    if (resultsSection) {
+      resultsSection.appendChild(bulkActionsContainer);
     }
   }
 
