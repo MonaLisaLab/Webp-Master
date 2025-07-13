@@ -11,6 +11,11 @@
   padding: 0;
   box-sizing: border-box;
 }
+a{
+  text-decoration: none;
+  color: var(--color-text-sub);
+  cursor: pointer;
+}
 
 html {
   font-size: 16px;
@@ -105,6 +110,15 @@ body {
   margin-right: 0.5rem;
   color: var(--color-text-sub);
   vertical-align: middle;
+}
+
+.footer__link-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  color: var(--color-text-sub);
+  vertical-align: middle;
+  transition: all 0.3s ease;
 }
 
 .note__icon {
@@ -461,6 +475,30 @@ body {
   border-top: 1px solid #e9ecef;
   padding: 2rem 0;
   text-align: center;
+  .container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-direction: column;
+  }
+}
+
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--color-text-sub);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer__link:hover {
+  color: #007bff;
+}
+
+.footer__link:hover .footer__link-icon {
+  color: #007bff;
 }
 
 .footer__text {
