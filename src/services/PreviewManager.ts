@@ -145,6 +145,10 @@ export class PreviewManager implements IPreviewManager {
   private createResultCardHTML(result: ConversionResult): string {
     const t = this.i18nService?.t.bind(this.i18nService) || ((key: string) => key);
     
+    // Calculate reduction percentage properly
+    const reductionPercent = result.compressionRatio > 0 ? result.compressionRatio : 0;
+    const isReduced = reductionPercent > 0;
+    
     return `
       <div class="result-card__preview">
         <div class="result-card__image-container">
@@ -159,27 +163,36 @@ export class PreviewManager implements IPreviewManager {
       
       <div class="result-card__info">
         <h3 class="result-card__title">${result.originalFile.name}</h3>
-        <p class="result-card__size">
+        
+        <div class="result-card__size">
           <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
             <polyline points="14,2 14,8 20,8"></polyline>
           </svg>
-          ${t('results.fileSize', { size: this.formatFileSize(result.convertedSize) })}
-        </p>
-        <p class="result-card__reduction">
+          <span class="result-card__size-detail">
+            ${this.formatFileSize(result.originalFile.size)} → ${this.formatFileSize(result.convertedSize)}
+          </span>
+        </div>
+        
+        <div class="result-card__reduction ${isReduced ? 'positive' : 'negative'}">
           <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
             <polyline points="17 6 23 6 23 12"></polyline>
           </svg>
-          ${t('results.reduction', { percent: Math.round((1 - result.compressionRatio) * 100).toString() })}
-        </p>
-        <p class="result-card__time">
+          <span class="result-card__reduction-detail">
+            ${isReduced ? `${reductionPercent}% 削減` : `${Math.abs(reductionPercent)}% 増加`}
+          </span>
+        </div>
+        
+        <div class="result-card__time">
           <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12,6 12,12 16,14"></polyline>
           </svg>
-          ${t('results.processingTime', { time: this.formatProcessingTime(result.processingTime) })}
-        </p>
+          <span class="result-card__time-detail">
+            ${this.formatProcessingTime(result.processingTime)}
+          </span>
+        </div>
       </div>
       
       <div class="result-card__actions">
@@ -254,17 +267,18 @@ export class PreviewManager implements IPreviewManager {
   }
 
   /**
-   * Add bulk actions to results
+   * Add bulk actions with improved layout
    */
   private addBulkActions(results: ConversionResult[]): void {
     if (!this.resultsGrid || results.length === 0) return;
 
     const t = this.i18nService?.t.bind(this.i18nService) || ((key: string) => key);
 
+    // Create bulk actions container
     const bulkActions = document.createElement('div');
     bulkActions.className = 'bulk-actions';
     bulkActions.innerHTML = `
-      <button class="button button--success" data-action="download-all">
+      <button class="button button--success bulk-action-btn" data-action="download-all">
         <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
           <polyline points="7,10 12,15 17,10"></polyline>
@@ -272,7 +286,7 @@ export class PreviewManager implements IPreviewManager {
         </svg>
         ${t('results.downloadAll')}
       </button>
-      <button class="button button--outline" data-action="clear">
+      <button class="button button--outline bulk-action-btn" data-action="clear">
         <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3,6 5,6 21,6"></polyline>
           <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
@@ -281,7 +295,8 @@ export class PreviewManager implements IPreviewManager {
       </button>
     `;
 
-    this.resultsGrid.appendChild(bulkActions);
+    // Insert bulk actions at the beginning of results grid
+    this.resultsGrid.insertBefore(bulkActions, this.resultsGrid.firstChild);
 
     // Setup bulk action events
     const downloadAllBtn = bulkActions.querySelector('[data-action="download-all"]');
