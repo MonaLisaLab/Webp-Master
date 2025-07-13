@@ -293,13 +293,13 @@ export class Application implements IApplication {
   /**
    * Handle download request
    */
-  private handleDownloadRequest(result: ConversionResult): void {
+  private handleDownloadRequest(_result: ConversionResult): void {
   }
 
   /**
    * Handle language change
    */
-  private handleLanguageChange(language: string): void {
+  private handleLanguageChange(_language: string): void {
     this.updateSeoForCurrentLanguage();
   }
 

@@ -47,7 +47,6 @@ export interface StructuredDataConfig {
 export class SeoMetaService {
   private readonly baseUrl: string;
   private readonly siteName: string = 'WebP Master';
-  private currentLanguage: SupportedLanguage = 'ja';
 
   constructor() {
     this.baseUrl = window.location.origin;
@@ -70,8 +69,6 @@ export class SeoMetaService {
       };
     }
   ): void {
-    this.currentLanguage = language;
-
     // Generate OGP image URL
     const ogpImageUrl = `${this.baseUrl}/src/assets/ogp.png`;
 

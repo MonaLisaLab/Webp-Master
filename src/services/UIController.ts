@@ -1,7 +1,6 @@
 import {
   ProgressInfo,
   ConversionError,
-  EventCallback,
   EventSubscription
 } from '@/types';
 import { IUIController } from '@/types/interfaces';

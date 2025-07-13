@@ -101,7 +101,6 @@ export class I18nService {
 
     if (language === this.currentLanguage) return;
 
-    const oldLanguage = this.currentLanguage;
     this.currentLanguage = language;
 
     // Save to localStorage
@@ -223,7 +222,7 @@ export class I18nService {
    */
   private setupRouting(): void {
     // Handle browser back/forward
-    window.addEventListener('popstate', (event) => {
+    window.addEventListener('popstate', (_event) => {
       const language = this.getLanguageFromURL();
       if (language && language !== this.currentLanguage) {
         this.currentLanguage = language;
