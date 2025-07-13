@@ -1,3 +1,10 @@
+/** 
+ * 🐧 variable
+ */
+:root {
+  --color-text-sub: #6c757d;
+}
+
 /* ===== Reset & Base Styles ===== */
 * {
   margin: 0;
@@ -28,14 +35,18 @@ body {
 /* ===== Header ===== */
 .header {
   background: white;
-  padding: 3rem 0;
+  padding: 2rem 0;
   text-align: center;
   border-bottom: 1px solid #e9ecef;
+  container-type: inline-size;
 }
 
 .header__title {
-  width: 40vw;
+  width: 30rem;
   margin: 0 auto;
+  @container (max-width: 520px) {
+    width: 100%;
+  }
   img{
     width: 100%;
     height: auto;
@@ -44,7 +55,7 @@ body {
 
 .header__subtitle {
   font-size: 1.1rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
   font-weight: 400;
 }
 
@@ -60,7 +71,7 @@ body {
 .upload-area__icon {
   width: 3rem;
   height: 3rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
   margin-bottom: 1rem;
 }
 
@@ -92,7 +103,15 @@ body {
   width: 1rem;
   height: 1rem;
   margin-right: 0.5rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
+  vertical-align: middle;
+}
+
+.note__icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  color: var(--color-text-sub);
   vertical-align: middle;
 }
 
@@ -115,7 +134,7 @@ body {
   height: 0.9rem;
   margin-right: 0.5rem;
   vertical-align: middle;
-  color: #6c757d;
+  color: var(--color-text-sub);
 }
 
 /* ===== Main Content ===== */
@@ -134,15 +153,9 @@ body {
   border-radius: 12px;
   padding: 4rem 2rem;
   text-align: center;
-  cursor: pointer;
   transition: all 0.3s ease;
   margin: 0 auto;
   max-width: 600px;
-}
-
-.upload-area:hover {
-  border-color: #007bff;
-  background: #f8f9ff;
 }
 
 .upload-area.dragover {
@@ -164,7 +177,7 @@ body {
 
 .upload-area__description {
   font-size: 1rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
   margin-bottom: 2rem;
 }
 
@@ -192,8 +205,12 @@ body {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   margin-top: 1.5rem;
+  .upload-area__formats-title{
+    color: var(--color-text-sub);
+  }
 }
 
 .format-tag {
@@ -257,7 +274,7 @@ body {
 
 .processing-info__text {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
 }
 
 /* ===== Results Section ===== */
@@ -348,7 +365,7 @@ body {
 
 .result-card__size {
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
   margin-bottom: 0.5rem;
 }
 
@@ -361,7 +378,7 @@ body {
 
 .result-card__time {
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
   margin-bottom: 0.5rem;
 }
 
@@ -429,7 +446,7 @@ body {
 
 .button--outline {
   background: transparent;
-  color: #6c757d;
+  color: var(--color-text-sub);
   border: 1px solid #dee2e6;
 }
 
@@ -448,7 +465,20 @@ body {
 
 .footer__text {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--color-text-sub);
+}
+
+.note {
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.note__text {
+  font-size: 0.9rem;
+  color: var(--color-text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===== Modal Styles ===== */
@@ -497,7 +527,7 @@ body {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--color-text-sub);
   padding: 0.5rem;
   border-radius: 4px;
   transition: all 0.3s ease;
