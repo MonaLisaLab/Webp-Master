@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "title": "WebP Master - PNG/JPG to WebP",
+    "description": "PNG・JPEG画像をWebP形式に簡単変換！サーバー送信なしの安全・高速処理",
+    "keywords": "WebP, 画像変換, PNG, JPEG, 変換ツール, 無料"
+  },
+  "header": {
+    "title": "WebP Master",
+    "subtitle": "PNG・JPEG画像を高品質なWebP形式に変換。サーバー送信なしでセキュアな画像変換サービス"
+  },
+  "upload": {
+    "title": "ファイルをドラッグ&ドロップ",
+    "description": "または下のボタンからファイルを選択してください",
+    "button": "ファイルを選択",
+    "formats": {
+      "title": "対応フォーマット",
+      "png": "PNG",
+      "jpeg": "JPEG",
+      "jpg": "JPG"
+    }
+  },
+  "processing": {
+    "title": "変換中...",
+    "preparing": "準備中...",
+    "reading": "ファイルを読み込み中...",
+    "processing": "画像を処理中...",
+    "converting": "WebP形式に変換中...",
+    "finalizing": "最終処理中..."
+  },
+  "results": {
+    "title": "変換完了",
+    "original": "元画像",
+    "converted": "変換後",
+    "fileSize": "ファイルサイズ: {{size}}",
+    "reduction": "{{percent}}% 削減",
+    "processingTime": "処理時間: {{time}}",
+    "download": "ダウンロード",
+    "viewFullsize": "フルサイズで表示",
+    "downloadAll": "すべてダウンロード",
+    "clear": "クリア"
+  },
+  "footer": {
+    "otherProducts": "他のプロダクト",
+    "copyright": "Copyright © 2025 ふろんと遠藤 All rights reserved."
+  },
+  "security": {
+    "note": "すべての処理はブラウザ内で実行されます。画像データは外部に送信されません。"
+  },
+  "errors": {
+    "title": "エラーが発生しました",
+    "unsupportedFormat": "サポートされていないファイル形式です",
+    "fileTooLarge": "ファイルサイズが大きすぎます",
+    "processingError": "処理中にエラーが発生しました",
+    "browserCompatibility": "お使いのブラウザはWebP Master に必要な機能をサポートしていません",
+    "unknownError": "予期しないエラーが発生しました",
+    "noFilesSelected": "ファイルが選択されていません",
+    "tooManyFiles": "一度に処理できるファイル数は{{max}}個までです",
+    "emptyFile": "ファイルが空です",
+    "retry": "再試行",
+    "close": "閉じる"
+  },
+  "success": {
+    "title": "変換完了！",
+    "singleFile": "1つの画像が正常に変換されました！",
+    "multipleFiles": "{{count}}個の画像が正常に変換されました！",
+    "ok": "OK"
+  },
+  "loading": {
+    "title": "読み込み中...",
+    "initializing": "WebP Master を初期化しています...",
+    "loadingTranslations": "言語データを読み込み中..."
+  },
+  "language": {
+    "switch": "Switch Language",
+    "japanese": "日本語",
+    "english": "English",
+    "currentLanguage": "現在の言語: {{language}}"
+  },
+  "fileInfo": {
+    "name": "ファイル名",
+    "size": "サイズ",
+    "type": "形式",
+    "lastModified": "更新日時"
+  },
+  "stats": {
+    "filesProcessed": "処理済みファイル数",
+    "totalSizeReduced": "総削減サイズ",
+    "averageCompression": "平均圧縮率",
+    "averageProcessingTime": "平均処理時間"
+  },
+  "modal": {
+    "close": "閉じる",
+    "confirm": "確認",
+    "cancel": "キャンセル"
+  },
+  "accessibility": {
+    "uploadArea": "ファイルアップロード領域",
+    "progressBar": "変換進捗バー",
+    "resultImage": "変換結果画像",
+    "downloadButton": "ダウンロードボタン",
+    "languageSwitcher": "言語切り替えボタン"
+  }
+} 

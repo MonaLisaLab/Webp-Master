@@ -44,6 +44,15 @@ body {
   text-align: center;
   border-bottom: 1px solid #e9ecef;
   container-type: inline-size;
+  position: relative;
+}
+
+.header .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
 }
 
 .header__title {
@@ -786,4 +795,108 @@ body {
   .main {
     padding: 1rem 0 !important;
   }
+} 
+
+/* ===== Language Switcher ===== */
+.language-switcher {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+}
+
+.language-switcher__button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.language-switcher__button:hover {
+  border-color: #007bff;
+  color: #007bff;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+}
+
+.language-switcher__icon {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 2;
+}
+
+.language-switcher__text {
+  font-weight: 500;
+}
+
+.language-switcher__dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.language-switcher__dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.language-switcher__option:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.language-switcher__option:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.language-switcher__option:hover {
+  background: #f8f9fa;
+  color: #007bff;
+}
+
+.language-switcher__option.active {
+  background: #007bff;
+  color: white;
+}
+
+.language-switcher__option.active:hover {
+  background: #0056b3;
+}
+
+.language-switcher__flag {
+  font-size: 1rem;
+  width: 1.2rem;
+  text-align: center;
 } 

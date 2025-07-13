@@ -13,17 +13,21 @@ import { FileHandler } from '@/services/FileHandler';
 import { ImageConverter } from '@/services/ImageConverter';
 import { UIController } from '@/services/UIController';
 import { PreviewManager } from '@/services/PreviewManager';
+import { I18nService } from '@/services/I18nService';
+import { SeoMetaService } from '@/services/SeoMetaService';
 import Swal from 'sweetalert2';
 
 /**
  * Main Application class
- * Coordinates all services and manages the application lifecycle
+ * Coordinates all services and manages the application lifecycle with I18n support
  */
 export class Application implements IApplication {
   private readonly fileHandler: FileHandler;
   private readonly imageConverter: ImageConverter;
   private readonly uiController: UIController;
   private readonly previewManager: PreviewManager;
+  private readonly i18nService: I18nService;
+  private readonly seoMetaService: SeoMetaService;
   private readonly subscriptions: EventSubscription[] = [];
   private isDisposed = false;
   private config: ConversionConfig;
@@ -38,6 +42,8 @@ export class Application implements IApplication {
     this.imageConverter = new ImageConverter();
     this.uiController = new UIController();
     this.previewManager = new PreviewManager();
+    this.i18nService = new I18nService();
+    this.seoMetaService = new SeoMetaService();
   }
 
   /**
@@ -47,14 +53,23 @@ export class Application implements IApplication {
     this.ensureNotDisposed();
     
     try {
-      // Initialize UI
-      this.uiController.initialize();
+      // Initialize I18n service first
+      await this.i18nService.initialize();
+      
+      // Initialize UI with I18n support
+      await this.uiController.initialize(this.i18nService, this.seoMetaService);
+      
+      // Inject I18n service into preview manager
+      this.previewManager.setI18nService(this.i18nService);
       
       // Setup event subscriptions
       this.setupEventSubscriptions();
       
       // Setup UI event handlers
       this.setupUIEventHandlers();
+      
+      // Initialize SEO meta tags
+      this.updateSeoForCurrentLanguage();
       
       console.log('🚀 WebP Master アプリケーションが正常に初期化されました！');
     } catch (error) {
@@ -188,6 +203,12 @@ export class Application implements IApplication {
       this.handleDownloadRequest(result);
     });
     this.subscriptions.push(downloadSub);
+
+    // Language change events
+    const languageChangeSub = this.i18nService.onLanguageChange((language) => {
+      this.handleLanguageChange(language);
+    });
+    this.subscriptions.push(languageChangeSub);
   }
 
   /**
@@ -290,6 +311,25 @@ export class Application implements IApplication {
   }
 
   /**
+   * Handle language change
+   */
+  private handleLanguageChange(language: string): void {
+    console.log(`🌏 言語が変更されました: ${language}`);
+    this.updateSeoForCurrentLanguage();
+  }
+
+  /**
+   * Update SEO meta tags for current language
+   */
+  private updateSeoForCurrentLanguage(): void {
+    this.seoMetaService.updateForLanguage(this.i18nService.getCurrentLanguage(), {
+      title: this.i18nService.t('meta.title'),
+      description: this.i18nService.t('meta.description'),
+      keywords: this.i18nService.t('meta.keywords')
+    });
+  }
+
+  /**
    * Display conversion results
    */
   private displayResults(results: ConversionResult[]): void {
@@ -298,7 +338,7 @@ export class Application implements IApplication {
         id: 'no-results',
         fileName: 'No results',
         errorType: 'processing_error' as any,
-        message: '変換された画像がありません',
+        message: this.i18nService.t('errors.noFilesSelected'),
         timestamp: Date.now()
       });
       return;
@@ -312,12 +352,12 @@ export class Application implements IApplication {
     
     // Show success toast
     const successMessage = results.length === 1 
-      ? '1つの画像が正常に変換されました！'
-      : `${results.length}個の画像が正常に変換されました！`;
+      ? this.i18nService.t('success.singleFile')
+      : this.i18nService.t('success.multipleFiles', { count: results.length.toString() });
     
     Swal.fire({
       icon: 'success',
-      title: '変換完了！',
+      title: this.i18nService.t('success.title'),
       text: successMessage,
       toast: true,
       position: 'top-end',

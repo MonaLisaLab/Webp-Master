@@ -4,18 +4,27 @@ import {
   EventSubscription
 } from '@/types';
 import { IPreviewManager } from '@/types/interfaces';
+import { I18nService } from './I18nService';
 
 /**
- * PreviewManager class - Single Responsibility Principle
- * Handles preview generation and download functionality
+ * PreviewManager class - Extended with internationalization support
+ * Handles image preview and download operations with multi-language support
  */
 export class PreviewManager implements IPreviewManager {
   private readonly downloadCallbacks: EventCallback<ConversionResult>[] = [];
   private isDisposed = false;
   private resultsGrid: HTMLElement | null = null;
+  private i18nService?: I18nService;
 
   constructor() {
     this.resultsGrid = document.getElementById('results-grid');
+  }
+
+  /**
+   * Set I18n service for translations
+   */
+  public setI18nService(i18nService: I18nService): void {
+    this.i18nService = i18nService;
   }
 
   /**
@@ -24,48 +33,34 @@ export class PreviewManager implements IPreviewManager {
   public async generatePreview(result: ConversionResult): Promise<HTMLElement> {
     this.ensureNotDisposed();
     
-    const card = document.createElement('div');
-    card.className = 'result-card';
-    card.setAttribute('data-result-id', result.id);
-
-    // Create preview section
-    const previewSection = this.createPreviewSection(result);
+    const resultCard = document.createElement('div');
+    resultCard.className = 'result-card';
+    resultCard.innerHTML = this.createResultCardHTML(result);
     
-    // Create info section
-    const infoSection = this.createInfoSection(result);
+    // Setup event listeners for actions
+    this.setupResultCardEvents(resultCard, result);
     
-    // Create actions section
-    const actionsSection = this.createActionsSection(result);
-
-    card.appendChild(previewSection);
-    card.appendChild(infoSection);
-    card.appendChild(actionsSection);
-
-    return card;
+    return resultCard;
   }
 
   /**
-   * Display conversion results
+   * Display multiple results in grid
    */
   public displayResults(results: ConversionResult[]): void {
     this.ensureNotDisposed();
     
     if (!this.resultsGrid) {
-      console.error('Results grid not found');
+      console.warn('Results grid not found');
       return;
     }
 
     // Clear previous results
-    this.clearPreviews();
+    this.resultsGrid.innerHTML = '';
 
-    // Add each result
+    // Add each result card
     results.forEach(async (result) => {
-      try {
-        const preview = await this.generatePreview(result);
-        this.resultsGrid?.appendChild(preview);
-      } catch (error) {
-        console.error('Error generating preview:', error);
-      }
+      const preview = await this.generatePreview(result);
+      this.resultsGrid!.appendChild(preview);
     });
 
     // Add bulk actions
@@ -80,15 +75,6 @@ export class PreviewManager implements IPreviewManager {
     
     if (this.resultsGrid) {
       this.resultsGrid.innerHTML = '';
-      
-      // Also remove bulk actions container
-      const resultsSection = this.resultsGrid.parentElement;
-      if (resultsSection) {
-        const bulkActions = resultsSection.querySelector('.bulk-actions');
-        if (bulkActions) {
-          resultsSection.removeChild(bulkActions);
-        }
-      }
     }
   }
 
@@ -98,38 +84,32 @@ export class PreviewManager implements IPreviewManager {
   public downloadFile(result: ConversionResult): void {
     this.ensureNotDisposed();
     
-    try {
-      const link = document.createElement('a');
-      link.href = result.convertedUrl;
-      link.download = this.generateFileName(result.originalFile.name);
-      link.style.display = 'none';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      this.notifyDownloadRequest(result);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
+    const link = document.createElement('a');
+    link.href = result.convertedUrl;
+    link.download = this.generateFileName(result.originalFile.name);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.notifyDownloadRequest(result);
   }
 
   /**
-   * Download all files as zip (simplified - individual downloads)
+   * Download all files
    */
   public downloadAll(results: ConversionResult[]): void {
     this.ensureNotDisposed();
     
     results.forEach((result, index) => {
-      // Stagger downloads to avoid browser restrictions
       setTimeout(() => {
         this.downloadFile(result);
-      }, index * 200);
+      }, 100 * index);
     });
   }
 
   /**
-   * Subscribe to download request events
+   * Subscribe to download events
    */
   public onDownloadRequest(callback: EventCallback<ConversionResult>): EventSubscription {
     this.ensureNotDisposed();
@@ -153,168 +133,100 @@ export class PreviewManager implements IPreviewManager {
     if (this.isDisposed) return;
     
     this.downloadCallbacks.length = 0;
-    this.clearPreviews();
+    this.resultsGrid = null;
     this.isDisposed = true;
   }
 
   // ===== Private Methods =====
 
   /**
-   * Create preview section with before/after images
+   * Create result card HTML
    */
-  private createPreviewSection(result: ConversionResult): HTMLElement {
-    const section = document.createElement('div');
-    section.className = 'result-card__preview';
-
-    // Original image
-    const originalImg = document.createElement('img');
-    originalImg.src = result.originalUrl;
-    originalImg.className = 'result-card__image';
-    originalImg.alt = `Original: ${result.originalFile.name}`;
-    originalImg.title = 'Original Image';
-
-    // Converted image
-    const convertedImg = document.createElement('img');
-    convertedImg.src = result.convertedUrl;
-    convertedImg.className = 'result-card__image';
-    convertedImg.alt = `Converted: ${result.originalFile.name}`;
-    convertedImg.title = 'Converted WebP Image';
-
-    // Labels
-    const originalLabel = document.createElement('div');
-    originalLabel.className = 'result-card__label';
-    originalLabel.textContent = 'Original';
-
-    const convertedLabel = document.createElement('div');
-    convertedLabel.className = 'result-card__label';
-    convertedLabel.textContent = 'WebP';
-
-    const originalContainer = document.createElement('div');
-    originalContainer.className = 'result-card__image-container';
-    originalContainer.appendChild(originalImg);
-    originalContainer.appendChild(originalLabel);
-
-    const convertedContainer = document.createElement('div');
-    convertedContainer.className = 'result-card__image-container';
-    convertedContainer.appendChild(convertedImg);
-    convertedContainer.appendChild(convertedLabel);
-
-    section.appendChild(originalContainer);
-    section.appendChild(convertedContainer);
-
-    return section;
+  private createResultCardHTML(result: ConversionResult): string {
+    const t = this.i18nService?.t.bind(this.i18nService) || ((key: string) => key);
+    
+    return `
+      <div class="result-card__preview">
+        <div class="result-card__image-container">
+          <img src="${result.originalUrl}" alt="${t('results.original')}" class="result-card__image">
+          <span class="result-card__label">${t('results.original')}</span>
+        </div>
+        <div class="result-card__image-container">
+          <img src="${result.convertedUrl}" alt="${t('results.converted')}" class="result-card__image">
+          <span class="result-card__label">${t('results.converted')}</span>
+        </div>
+      </div>
+      
+      <div class="result-card__info">
+        <h3 class="result-card__title">${result.originalFile.name}</h3>
+        <p class="result-card__size">
+          <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+          </svg>
+          ${t('results.fileSize', { size: this.formatFileSize(result.convertedSize) })}
+        </p>
+        <p class="result-card__reduction">
+          <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          ${t('results.reduction', { percent: Math.round((1 - result.compressionRatio) * 100).toString() })}
+        </p>
+        <p class="result-card__time">
+          <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12,6 12,12 16,14"></polyline>
+          </svg>
+          ${t('results.processingTime', { time: this.formatProcessingTime(result.processingTime) })}
+        </p>
+      </div>
+      
+      <div class="result-card__actions">
+        <button class="button button--primary download-btn" data-action="download">
+          <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+            <polyline points="7,10 12,15 17,10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          ${t('results.download')}
+        </button>
+        <button class="button button--secondary fullsize-btn" data-action="fullsize">
+          <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"></path>
+          </svg>
+          ${t('results.viewFullsize')}
+        </button>
+      </div>
+    `;
   }
 
   /**
-   * Create info section with file details
+   * Setup event listeners for result card
    */
-  private createInfoSection(result: ConversionResult): HTMLElement {
-    const section = document.createElement('div');
-    section.className = 'result-card__info';
+  private setupResultCardEvents(card: HTMLElement, result: ConversionResult): void {
+    const downloadBtn = card.querySelector('.download-btn');
+    const fullsizeBtn = card.querySelector('.fullsize-btn');
 
-    // File title
-    const title = document.createElement('h3');
-    title.className = 'result-card__title';
-    title.textContent = result.originalFile.name;
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        this.downloadFile(result);
+      });
+    }
 
-    // File size info
-    const sizeInfo = document.createElement('p');
-    sizeInfo.className = 'result-card__size';
-    sizeInfo.innerHTML = `
-      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
-        <polyline points="14,2 14,8 20,8"></polyline>
-        <line x1="16" y1="13" x2="8" y2="13"></line>
-        <line x1="16" y1="17" x2="8" y2="17"></line>
-        <polyline points="10,9 9,9 8,9"></polyline>
-      </svg>
-      ${this.formatFileSize(result.originalFile.size)} → ${this.formatFileSize(result.convertedSize)}
-    `;
-
-    // Compression ratio
-    const reductionInfo = document.createElement('p');
-    reductionInfo.className = 'result-card__reduction';
-    const reductionText = result.compressionRatio > 0 
-      ? `${result.compressionRatio}% 圧縮`
-      : 'サイズが増加しました';
-    reductionInfo.innerHTML = `
-      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="21,8 21,21 3,21 3,8"></polyline>
-        <rect x="1" y="3" width="22" height="5"></rect>
-        <line x1="10" y1="12" x2="14" y2="12"></line>
-      </svg>
-      ${reductionText}
-    `;
-
-    // Processing time
-    const timeInfo = document.createElement('p');
-    timeInfo.className = 'result-card__time';
-    timeInfo.innerHTML = `
-      <svg class="result-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12,6 12,12 16,14"></polyline>
-      </svg>
-      ${this.formatProcessingTime(result.processingTime)}
-    `;
-
-    section.appendChild(title);
-    section.appendChild(sizeInfo);
-    section.appendChild(reductionInfo);
-    section.appendChild(timeInfo);
-
-    return section;
-  }
-
-  /**
-   * Create actions section with download buttons
-   */
-  private createActionsSection(result: ConversionResult): HTMLElement {
-    const section = document.createElement('div');
-    section.className = 'result-card__actions';
-
-    // Download button
-    const downloadBtn = document.createElement('button');
-    downloadBtn.className = 'button button--primary';
-    downloadBtn.innerHTML = `
-      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-        <polyline points="7,10 12,15 17,10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-      ダウンロード
-    `;
-    downloadBtn.addEventListener('click', () => {
-      this.downloadFile(result);
-    });
-
-    // View fullsize button
-    const viewBtn = document.createElement('button');
-    viewBtn.className = 'button button--secondary';
-    viewBtn.innerHTML = `
-      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M15 3h4a2 2 0 012 2v4"></path>
-        <path d="M14 9l5-5"></path>
-        <path d="M9 21H5a2 2 0 01-2-2v-4"></path>
-        <path d="M10 15l-5 5"></path>
-      </svg>
-      フルサイズで表示
-    `;
-    viewBtn.addEventListener('click', () => {
-      this.viewFullsize(result);
-    });
-
-    section.appendChild(downloadBtn);
-    section.appendChild(viewBtn);
-
-    return section;
+    if (fullsizeBtn) {
+      fullsizeBtn.addEventListener('click', () => {
+        this.viewFullsize(result);
+      });
+    }
   }
 
   /**
    * Generate filename for download
    */
   private generateFileName(originalName: string): string {
-    const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, '');
-    return `${nameWithoutExtension}.webp`;
+    const nameWithoutExt = originalName.replace(/\.[^/.]+$/, '');
+    return `${nameWithoutExt}.webp`;
   }
 
   /**
@@ -335,126 +247,91 @@ export class PreviewManager implements IPreviewManager {
    */
   private formatProcessingTime(milliseconds: number): string {
     if (milliseconds < 1000) {
-      return `${milliseconds}ms`;
+      return `${Math.round(milliseconds)}ms`;
     } else {
-      const seconds = (milliseconds / 1000).toFixed(1);
-      return `${seconds}s`;
+      return `${(milliseconds / 1000).toFixed(2)}s`;
     }
   }
 
   /**
-   * Add bulk actions (Download All, Clear)
+   * Add bulk actions to results
    */
   private addBulkActions(results: ConversionResult[]): void {
-    if (!this.resultsGrid) return;
+    if (!this.resultsGrid || results.length === 0) return;
 
-    const bulkActionsContainer = document.createElement('div');
-    bulkActionsContainer.className = 'bulk-actions';
+    const t = this.i18nService?.t.bind(this.i18nService) || ((key: string) => key);
 
-    // Download All button
-    const downloadAllBtn = document.createElement('button');
-    downloadAllBtn.className = 'button button--success';
-    downloadAllBtn.innerHTML = `
-      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-        <polyline points="7,10 12,15 17,10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-      すべてダウンロード
+    const bulkActions = document.createElement('div');
+    bulkActions.className = 'bulk-actions';
+    bulkActions.innerHTML = `
+      <button class="button button--success" data-action="download-all">
+        <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+          <polyline points="7,10 12,15 17,10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        ${t('results.downloadAll')}
+      </button>
+      <button class="button button--outline" data-action="clear">
+        <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3,6 5,6 21,6"></polyline>
+          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+        </svg>
+        ${t('results.clear')}
+      </button>
     `;
-    downloadAllBtn.addEventListener('click', () => {
-      this.downloadAll(results);
-    });
 
-    // Clear button
-    const clearBtn = document.createElement('button');
-    clearBtn.className = 'button button--outline';
-    clearBtn.innerHTML = `
-      <svg class="button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3,6 5,6 21,6"></polyline>
-        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-      </svg>
-      クリア
-    `;
-    clearBtn.addEventListener('click', () => {
-      this.clearPreviews();
-    });
+    this.resultsGrid.appendChild(bulkActions);
 
-    bulkActionsContainer.appendChild(downloadAllBtn);
-    bulkActionsContainer.appendChild(clearBtn);
+    // Setup bulk action events
+    const downloadAllBtn = bulkActions.querySelector('[data-action="download-all"]');
+    const clearBtn = bulkActions.querySelector('[data-action="clear"]');
 
-    // Add to results grid parent
-    const resultsSection = this.resultsGrid.parentElement;
-    if (resultsSection) {
-      resultsSection.appendChild(bulkActionsContainer);
+    if (downloadAllBtn) {
+      downloadAllBtn.addEventListener('click', () => {
+        this.downloadAll(results);
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.clearPreviews();
+      });
     }
   }
 
   /**
-   * View image in fullsize
+   * View image in fullsize modal
    */
   private viewFullsize(result: ConversionResult): void {
     const modal = document.createElement('div');
     modal.className = 'fullsize-modal';
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      cursor: pointer;
+    modal.innerHTML = `
+      <img src="${result.convertedUrl}" alt="${result.originalFile.name}">
     `;
 
-    const img = document.createElement('img');
-    img.src = result.convertedUrl;
-    img.style.cssText = `
-      max-width: 90%;
-      max-height: 90%;
-      object-fit: contain;
-      border-radius: 8px;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '×';
-    closeBtn.style.cssText = `
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 10001;
-    `;
+    document.body.appendChild(modal);
 
     const closeModal = () => {
       document.body.removeChild(modal);
     };
 
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
+    // Close on click
+    modal.addEventListener('click', closeModal);
 
-    modal.appendChild(img);
-    modal.appendChild(closeBtn);
-    document.body.appendChild(modal);
+    // Close on Escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
   }
 
-
-
   /**
-   * Notify download request
+   * Notify download request listeners
    */
   private notifyDownloadRequest(result: ConversionResult): void {
     this.downloadCallbacks.forEach(callback => {
