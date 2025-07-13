@@ -325,7 +325,13 @@ export class Application implements IApplication {
     this.seoMetaService.updateForLanguage(this.i18nService.getCurrentLanguage(), {
       title: this.i18nService.t('meta.title'),
       description: this.i18nService.t('meta.description'),
-      keywords: this.i18nService.t('meta.keywords')
+      keywords: this.i18nService.t('meta.keywords'),
+      ogp: {
+        title: this.i18nService.t('ogp.title'),
+        description: this.i18nService.t('ogp.description'),
+        siteName: this.i18nService.t('ogp.siteName'),
+        imageAlt: this.i18nService.t('ogp.imageAlt')
+      }
     });
   }
 

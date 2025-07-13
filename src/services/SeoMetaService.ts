@@ -58,9 +58,27 @@ export class SeoMetaService {
    */
   public updateForLanguage(
     language: SupportedLanguage,
-    translations: { title: string; description: string; keywords: string }
+    translations: { 
+      title: string; 
+      description: string; 
+      keywords: string;
+      ogp?: {
+        title: string;
+        description: string;
+        siteName: string;
+        imageAlt: string;
+      };
+    }
   ): void {
     this.currentLanguage = language;
+
+    // Generate OGP image URL
+    const ogpImageUrl = `${this.baseUrl}/src/assets/ogp.png`;
+
+    // Use OGP-specific translations if available, otherwise fallback to meta translations
+    const ogpTitle = translations.ogp?.title || translations.title;
+    const ogpDescription = translations.ogp?.description || translations.description;
+    const ogpSiteName = translations.ogp?.siteName || this.siteName;
 
     // Update basic meta tags
     this.updateBasicMetaTags({
@@ -76,27 +94,36 @@ export class SeoMetaService {
 
     // Update Open Graph tags
     this.updateOpenGraphTags({
-      title: translations.title,
-      description: translations.description,
+      title: ogpTitle,
+      description: ogpDescription,
       type: 'website',
       url: this.getCurrentUrl(),
-      siteName: this.siteName,
+      image: ogpImageUrl,
+      siteName: ogpSiteName,
       locale: this.getLocaleCode(language)
     });
+
+    // Add additional OGP properties
+    this.updateMetaTag('og:image:alt', translations.ogp?.imageAlt || ogpTitle, 'property');
+    this.updateMetaTag('og:image:width', '1200', 'property');
+    this.updateMetaTag('og:image:height', '630', 'property');
+    this.updateMetaTag('og:image:type', 'image/png', 'property');
 
     // Update Twitter Card tags
     this.updateTwitterCardTags({
       card: 'summary_large_image',
-      title: translations.title,
-      description: translations.description,
-      site: '@frontend_endo'
+      title: ogpTitle,
+      description: ogpDescription,
+      image: ogpImageUrl,
+      site: '@frontend_endo',
+      creator: '@frontend_endo'
     });
 
     // Update structured data
     this.updateStructuredData({
       type: 'WebApplication',
-      name: this.siteName,
-      description: translations.description,
+      name: ogpSiteName,
+      description: ogpDescription,
       url: this.getCurrentUrl(),
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'Any',

@@ -4,6 +4,12 @@
     "description": "PNG・JPEG画像をWebP形式に簡単変換！サーバー送信なしの安全・高速処理",
     "keywords": "WebP, 画像変換, PNG, JPEG, 変換ツール, 無料"
   },
+  "ogp": {
+    "title": "WebP Master - 無料画像変換サービス",
+    "description": "PNG・JPEG画像をWebP形式に簡単変換！ブラウザ上で完結する安全・高速処理。サーバー送信なしでプライバシー保護。",
+    "siteName": "WebP Master",
+    "imageAlt": "WebP Master - 画像変換サービスのロゴ"
+  },
   "header": {
     "title": "WebP Master",
     "subtitle": "PNG・JPEG画像を高品質なWebP形式に変換。サーバー送信なしでセキュアな画像変換サービス"
@@ -35,7 +41,7 @@
     "reduction": "{{percent}}% 削減",
     "processingTime": "処理時間: {{time}}",
     "download": "ダウンロード",
-    "viewFullsize": "フルサイズで表示",
+    "viewFullsize": "画像を見る",
     "downloadAll": "すべてダウンロード",
     "clear": "クリア"
   },

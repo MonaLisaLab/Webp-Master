@@ -4,6 +4,12 @@
     "description": "Convert PNG & JPEG images to WebP format easily! Secure and fast processing without server upload",
     "keywords": "WebP, image conversion, PNG, JPEG, converter tool, free"
   },
+  "ogp": {
+    "title": "WebP Master - Free Image Conversion Service",
+    "description": "Convert PNG & JPEG images to WebP format easily! Secure and fast processing completed in your browser. Privacy protection without server upload.",
+    "siteName": "WebP Master",
+    "imageAlt": "WebP Master - Image conversion service logo"
+  },
   "header": {
     "title": "WebP Master",
     "subtitle": "Convert PNG & JPEG images to high-quality WebP format. Secure image conversion service without server upload"
@@ -35,7 +41,7 @@
     "reduction": "{{percent}}% reduction",
     "processingTime": "Processing time: {{time}}",
     "download": "Download",
-    "viewFullsize": "View fullsize",
+    "viewFullsize": "View Image",
     "downloadAll": "Download All",
     "clear": "Clear"
   },
