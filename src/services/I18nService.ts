@@ -68,7 +68,6 @@ export class I18nService {
     this.updateDocumentLanguage();
     
     this.isInitialized = true;
-    console.log(`🌍 I18n Service initialized with language: ${this.currentLanguage}`);
   }
 
   /**
@@ -97,7 +96,6 @@ export class I18nService {
    */
   public async switchLanguage(language: SupportedLanguage): Promise<void> {
     if (!this.isLanguageSupported(language)) {
-      console.warn(`⚠️ Language ${language} is not supported`);
       return;
     }
 
@@ -117,8 +115,6 @@ export class I18nService {
 
     // Notify listeners
     this.notifyLanguageChange(language);
-
-    console.log(`🌏 Language switched from ${oldLanguage} to ${language}`);
   }
 
   /**
@@ -128,7 +124,6 @@ export class I18nService {
     const translation = this.getNestedTranslation(key, this.currentLanguage);
     
     if (!translation) {
-      console.warn(`⚠️ Translation missing for key: ${key} (${this.currentLanguage})`);
       return key;
     }
 
@@ -216,7 +211,6 @@ export class I18nService {
         en: enTranslations.default || enTranslations
       };
 
-      console.log('📚 Translation data loaded successfully');
     } catch (error) {
       console.error('❌ Failed to load translations:', error);
       // Use fallback empty translations

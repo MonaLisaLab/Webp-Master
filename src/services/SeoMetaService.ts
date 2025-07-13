@@ -134,8 +134,6 @@ export class SeoMetaService {
         'url': 'https://front-endo.com'
       }
     });
-
-    console.log(`🎯 SEO meta tags updated for language: ${language}`);
   }
 
   /**

@@ -14,8 +14,6 @@ let app: Application | null = null;
  */
 async function initializeApp(): Promise<void> {
   try {
-    console.log('🚀 WebP Master を初期化しています...');
-    
     // Check browser compatibility
     if (!checkBrowserCompatibility()) {
       showCompatibilityError();
@@ -30,8 +28,6 @@ async function initializeApp(): Promise<void> {
     
     // Start application
     app.start();
-    
-    console.log('✨ WebP Master が正常に起動しました！');
     
   } catch (error) {
     console.error('❌ アプリケーションの起動に失敗しました:', error);
@@ -51,14 +47,12 @@ function checkBrowserCompatibility(): boolean {
     downloadAttribute: 'download' in document.createElement('a')
   };
   
-  console.log('🔍 ブラウザ互換性チェック:', checks);
-  
   const unsupportedFeatures = Object.entries(checks)
     .filter(([, supported]) => !supported)
     .map(([feature]) => feature);
   
   if (unsupportedFeatures.length > 0) {
-    console.warn('⚠️ 一部機能がサポートされていません:', unsupportedFeatures);
+    // Some features are not supported
   }
   
   // WebP and Canvas are critical
@@ -193,7 +187,6 @@ function showInitializationError(error: unknown): void {
  */
 function handlePageUnload(): void {
   if (app) {
-    console.log('🧹 アプリケーションをクリーンアップしています...');
     app.dispose();
     app = null;
   }
@@ -275,7 +268,6 @@ function handleUnhandledRejection(event: PromiseRejectionEvent): void {
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('📄 DOM読み込み完了');
   initializeApp();
 });
 
@@ -289,7 +281,6 @@ window.addEventListener('unhandledrejection', handleUnhandledRejection);
 // Development Hot Reload (Vite)
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    console.log('🔄 Hot Reload: クリーンアップ中...');
     if (app) {
       app.dispose();
       app = null;
@@ -306,6 +297,4 @@ if (typeof window !== 'undefined') {
     reset: () => app?.reset(),
     version: '1.0.0'
   };
-}
-
-console.log('🖼️ WebP Master v1.0.0 - Ready to convert images!'); 
+} 

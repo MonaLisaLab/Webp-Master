@@ -70,8 +70,6 @@ export class Application implements IApplication {
       
       // Initialize SEO meta tags
       this.updateSeoForCurrentLanguage();
-      
-      console.log('🚀 WebP Master アプリケーションが正常に初期化されました！');
     } catch (error) {
       console.error('❌ アプリケーションの初期化に失敗しました:', error);
       throw error;
@@ -83,8 +81,6 @@ export class Application implements IApplication {
    */
   public start(): void {
     this.ensureNotDisposed();
-    
-    console.log('✨ WebP Master アプリケーションが開始されました！');
   }
 
   /**
@@ -98,8 +94,6 @@ export class Application implements IApplication {
     
     // Clear UI
     this.uiController.clearUI();
-    
-    console.log('🛑 WebP Master アプリケーションが停止されました');
   }
 
   /**
@@ -128,8 +122,6 @@ export class Application implements IApplication {
     
     // Reset stats
     this.stats = this.initializeStats();
-    
-    console.log('🔄 アプリケーションがリセットされました');
   }
 
   /**
@@ -151,7 +143,6 @@ export class Application implements IApplication {
     this.previewManager.dispose();
     
     this.isDisposed = true;
-    console.log('🧹 アプリケーションが正常に破棄されました');
   }
 
   // ===== Private Methods =====
@@ -248,8 +239,6 @@ export class Application implements IApplication {
    */
   private async handleFilesSelected(files: FileInfo[]): Promise<void> {
     try {
-      console.log(`📁 ${files.length} 個のファイルが選択されました`);
-      
       // Show processing section
       this.uiController.showProcessingSection();
       
@@ -289,8 +278,6 @@ export class Application implements IApplication {
   private handleConversionComplete(result: ConversionResult): void {
     // Update statistics
     this.updateStats(result);
-    
-    console.log(`✅ 変換完了: ${result.originalFile.name}`);
   }
 
   /**
@@ -307,14 +294,12 @@ export class Application implements IApplication {
    * Handle download request
    */
   private handleDownloadRequest(result: ConversionResult): void {
-    console.log(`📥 ダウンロード: ${result.originalFile.name}`);
   }
 
   /**
    * Handle language change
    */
   private handleLanguageChange(language: string): void {
-    console.log(`🌏 言語が変更されました: ${language}`);
     this.updateSeoForCurrentLanguage();
   }
 

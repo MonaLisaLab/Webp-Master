@@ -56,8 +56,6 @@ export class UIController implements IUIController {
     if (this.i18nService) {
       await this.initializeLanguageSupport();
     }
-    
-    console.log('🎨 UI Controller initialized with I18n support');
   }
 
   /**
@@ -174,8 +172,6 @@ export class UIController implements IUIController {
 
     // Update language switcher text
     this.updateLanguageSwitcherText(language);
-
-    console.log(`🌏 UI updated for language: ${language}`);
   }
 
   /**
@@ -588,8 +584,6 @@ export class UIController implements IUIController {
     this.removeAllEventListeners();
     this.elements = {};
     this.isDisposed = true;
-    
-    console.log('🧹 UI Controller disposed');
   }
 
   // ===== Private Methods =====

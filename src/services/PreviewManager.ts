@@ -50,7 +50,6 @@ export class PreviewManager implements IPreviewManager {
     this.ensureNotDisposed();
     
     if (!this.resultsGrid) {
-      console.warn('Results grid not found');
       return;
     }
 
