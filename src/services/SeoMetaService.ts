@@ -70,7 +70,7 @@ export class SeoMetaService {
     }
   ): void {
     // Generate OGP image URL
-    const ogpImageUrl = `${this.baseUrl}/src/assets/ogp.png`;
+    const ogpImageUrl = `${this.baseUrl}/assets/ogp.png`;
 
     // Use OGP-specific translations if available, otherwise fallback to meta translations
     const ogpTitle = translations.ogp?.title || translations.title;
